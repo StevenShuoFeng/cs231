@@ -135,7 +135,7 @@ class KNearestNeighbor(object):
     
     TF = X.dot(self.X_train.T)
     
-    print(T_Square.shape, F_Square.shape, TF.shape)
+    # print(T_Square.shape, F_Square.shape, TF.shape)
     
     dists = T_Square - 2*TF + F_Square
     dists = np.sqrt(dists)
