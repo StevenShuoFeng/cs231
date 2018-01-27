@@ -109,9 +109,10 @@ def grad_check_sparse(f, x, analytic_grad, num_checks=10, h=1e-5):
   sample a few random elements and only return numerical
   in this dimensions.
   """
-
+  # h is the delta value for variable x (weight)
+    
   for i in xrange(num_checks):
-    ix = tuple([randrange(m) for m in x.shape])
+    ix = tuple([randrange(m) for m in x.shape]) # randomly pick a 2D tuple as index for x's shape
 
     oldval = x[ix]
     x[ix] = oldval + h # increment by h
@@ -120,9 +121,12 @@ def grad_check_sparse(f, x, analytic_grad, num_checks=10, h=1e-5):
     fxmh = f(x) # evaluate f(x - h)
     x[ix] = oldval # reset
 
+    # numerical graident: [f(x+h) - f(x-h)] / 2h
     # finite difference to compute the gradient
     grad_numerical = (fxph - fxmh) / (2 * h)
     grad_analytic = analytic_grad[ix]
+    
+    # normalzied error
     rel_error = abs(grad_numerical - grad_analytic) / (abs(grad_numerical) + abs(grad_analytic))
     print('numerical: %f analytic: %f, relative error: %e' % (grad_numerical, grad_analytic, rel_error))
 

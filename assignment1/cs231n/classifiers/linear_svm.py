@@ -54,16 +54,6 @@ def svm_loss_naive(W, X, y, reg):
   # loss += 0.5*reg * np.sum(W * W)
   # dW +=  reg * np.sum(W * W)
 
-  #############################################################################
-  # TODO:                                                                     #
-  # Compute the gradient of the loss function and store it dW.                #
-  # Rather that first computing the loss and then computing the derivative,   #
-  # it may be simpler to compute the derivative at the same time that the     #
-  # loss is being computed. As a result you may need to modify some of the    #
-  # code above to compute the gradient.                                       #
-  #############################################################################
-
-
   return loss, dW
 
 
@@ -73,6 +63,10 @@ def svm_loss_vectorized(W, X, y, reg):
 
   Inputs and outputs are the same as svm_loss_naive.
   """
+  N = X.shape[0]
+  C = W.shape[1]
+  delta = 1
+
   loss = 0.0
   dW = np.zeros(W.shape) # initialize the gradient as zero
 
@@ -81,7 +75,16 @@ def svm_loss_vectorized(W, X, y, reg):
   # Implement a vectorized version of the structured SVM loss, storing the    #
   # result in loss.                                                           #
   #############################################################################
-  pass
+  scores = X.dot(W)
+  correct_class_score = scores[range(N), y]
+  correct_class_score = np.tile(correct_class_score.reshape(-1,1), C) 
+  
+  margin = scores - correct_class_score + delta
+    
+  margin[range(N), y] = 0 # Y_i class won't contribute to the loss
+  margin[margin < 0] = 0 # max function, set margin to 0 if negative
+    
+  loss = np.sum(margin)/N + reg * np.sum(W * W)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
