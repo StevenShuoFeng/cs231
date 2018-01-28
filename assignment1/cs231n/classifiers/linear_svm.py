@@ -89,7 +89,7 @@ def svm_loss_vectorized(W, X, y, reg):
   correct_class_score = scores[range(N), y]
   correct_class_score = np.tile(correct_class_score.reshape(-1,1), C) 
   
-  margin = scores - correct_class_score + delta
+  margin = scores - correct_class_score + delta # shape (N, C)
     
   margin[range(N), y] = 0 # Y_i class won't contribute to the loss
   margin[margin < 0] = 0 # max function, set margin to 0 if negative
