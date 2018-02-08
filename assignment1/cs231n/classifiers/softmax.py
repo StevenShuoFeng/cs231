@@ -105,7 +105,7 @@ def softmax_loss_vectorized(W, X, y, reg):
     I = np.zeros(F.shape) # shape (N, C) indicator matrix for the true class label
     I[range(N), y] = np.ones(N)
     
-    dW = (X.T).dot(-I + P)/N + 2*reg * W 
+    dW = X.T.dot(-I + P)/N + 2*reg * W 
     # --- Analytical derivatives is given in the softmax.ipynb notebook
 
     #############################################################################

@@ -4,6 +4,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from past.builtins import xrange
 
+ReLU = lambda x : np.maximum(x, np.zeros(x.shape))
+
+def softmax(a):
+    # input: a the score vector
+    a = np.reshape(np.prod(a.shape), 1)
+    a -= np.max(a)
+    p = np.exp(a)
+    p /= np.sum(p)
+    
+    return -np.log(p)
+    
 class TwoLayerNet(object):
   """
   A two-layer fully-connected neural network. The net has an input dimension of
@@ -35,7 +46,7 @@ class TwoLayerNet(object):
     - hidden_size: The number of neurons H in the hidden layer.
     - output_size: The number of classes C.
     """
-    self.params = {}
+    self.params = {} 
     self.params['W1'] = std * np.random.randn(input_size, hidden_size)
     self.params['b1'] = np.zeros(hidden_size)
     self.params['W2'] = std * np.random.randn(hidden_size, output_size)
@@ -68,7 +79,8 @@ class TwoLayerNet(object):
     W1, b1 = self.params['W1'], self.params['b1']
     W2, b2 = self.params['W2'], self.params['b2']
     N, D = X.shape
-
+    C = W2.shape[1]
+    
     # Compute the forward pass
     scores = None
     #############################################################################
@@ -76,7 +88,10 @@ class TwoLayerNet(object):
     # Store the result in the scores variable, which should be an array of      #
     # shape (N, C).                                                             #
     #############################################################################
-    pass
+    H1 = ReLU(X.dot(W1) + b1)
+    H2 = H1.dot(W2) + b2
+    
+    scores = H2
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -93,13 +108,35 @@ class TwoLayerNet(object):
     # in the variable loss, which should be a scalar. Use the Softmax           #
     # classifier loss.                                                          #
     #############################################################################
-    pass
+    scores = (scores.T - np.amax(scores, axis=1)).T
+    scores = np.exp(scores) # shape (N, C), exp score
+    
+    probs = (scores.T / np.sum(scores, axis=1)).T
+    loss_vec = - np.log(probs[range(N), y])
+    
+    loss = np.sum(loss_vec)/N + reg* (np.sum(W1*W1) + np.sum(W2*W2))
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
-
-    # Backward pass: compute gradients
+    # Gradient to W1, b1, W2 and b2
     grads = {}
+    
+    # Backward pass: compute gradients    
+    I = np.zeros(probs.shape) # shape (N, C) indicator matrix for the true class label
+    I[range(N), y] = np.ones(N)
+    
+    dW2 = H1.T.dot(-I + probs)/N + 2*reg*W2 
+    db2 = np.ones((1, N)).dot(-I + probs)/N
+    
+    dLdH1 = (-I + probs).dot(W2.T)
+    dLdH1[H1==0] = 0 # the indicator for max(0, X*W1)
+    dW1 = X.T.dot(dLdH1)/N + 2*reg*W1
+    db1 = np.ones((1, N)).dot(dLdH1)/N
+    
+    grads['W2'] = dW2
+    grads['b2'] = db2
+    grads['W1'] = dW1
+    grads['b1'] = db1
     #############################################################################
     # TODO: Compute the backward pass, computing the derivatives of the weights #
     # and biases. Store the results in the grads dictionary. For example,       #
