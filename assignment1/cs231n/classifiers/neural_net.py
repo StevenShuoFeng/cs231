@@ -113,6 +113,11 @@ class TwoLayerNet(object):
     # Gradient to W1, b1, W2 and b2
     grads = {}
     
+    #############################################################################
+    # TODO: Compute the backward pass, computing the derivatives of the weights #
+    # and biases. Store the results in the grads dictionary. For example,       #
+    # grads['W1'] should store the gradient on W1, and be a matrix of same size #
+    #############################################################################    
     # Backward pass: compute gradients    
     I = np.zeros(probs.shape) # shape (N, C) indicator matrix for the true class label
     I[range(N), y] = np.ones(N)
@@ -129,12 +134,6 @@ class TwoLayerNet(object):
     grads['b2'] = np.squeeze(db2)
     grads['W1'] = dW1
     grads['b1'] = np.squeeze(db1)
-    #############################################################################
-    # TODO: Compute the backward pass, computing the derivatives of the weights #
-    # and biases. Store the results in the grads dictionary. For example,       #
-    # grads['W1'] should store the gradient on W1, and be a matrix of same size #
-    #############################################################################
-    pass
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
